@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #10b981; /* Emerald 500 */
+  --color-primary-hover: #059669; /* Emerald 600 */
+  
+  --color-background-start: #0f172a; /* Slate 900 */
+  --color-background-end: #020617; /* Slate 950 */
+  
+  --color-card: rgba(30, 41, 59, 0.4); /* Slate 800 with opacity */
+  --color-card-hover: rgba(51, 65, 85, 0.6);
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
+  --animate-pulse-slow: pulse-slow 4s infinite alternate ease-in-out;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-slow {
+    from { opacity: 0.3; transform: scale(1); }
+    to { opacity: 0.6; transform: scale(1.05); }
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #020617;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617; /* Darkslate */
+    --foreground: #f8fafc; /* Slate 50 */
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  /* Add a subtle dark gradient by default in dark mode (which we are prioritizing) */
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: radial-gradient(circle at top left, var(--color-background-start), var(--color-background-end));
+    background-attachment: fixed;
+  }
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--color-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  background: var(--color-card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
