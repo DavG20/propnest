@@ -1,4 +1,4 @@
-export type Role = "admin" | "agent" | "client";
+export type Role = "admin" | "realtor" | "buyer" | "seller";
 
 export interface User {
   id: number;
@@ -19,6 +19,10 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface LogoutRequest {
+  token: string;
+}
+
 export interface LoginResponse {
   token: string;
   user: User;
@@ -27,4 +31,8 @@ export interface LoginResponse {
 export interface RegisterResponse {
   message: string;
   user_id: number;
+}
+
+export interface LogoutResponse {
+  status: boolean;
 }

@@ -1,9 +1,11 @@
-import { apiRequest } from "@/lib/api";
-import { 
-  LoginRequest, 
-  LoginResponse, 
-  RegisterRequest, 
-  RegisterResponse 
+import { apiRequest } from "@/lib/auth";
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  LogoutRequest,
+  LogoutResponse
 } from "@/types/auth";
 
 export const authService = {
@@ -18,6 +20,17 @@ export const authService = {
     return apiRequest<RegisterResponse>("/register", {
       method: "POST",
       body: JSON.stringify(userData),
+    });
+  },
+  logout: async (): Promise<LogoutResponse> => {
+    const token = localStorage.getItem("token");
+
+    return apiRequest<LogoutResponse>("/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
 };

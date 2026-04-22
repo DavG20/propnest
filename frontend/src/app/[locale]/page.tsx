@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Search, Home, Shield, TrendingUp, ChevronRight } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { getI18n } from "@/locales/server";
+
 import PropertyCard from "./properties/_components/PropertyCard";
 
-export default function LandingPage() {
-  const t = useTranslations();
+export default async function LandingPage() {
+  const t = await getI18n();
+
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 relative selection:bg-emerald-500/30">

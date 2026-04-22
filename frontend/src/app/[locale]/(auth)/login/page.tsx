@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { FormInput } from "@/components/ui/FormInput";
 import { authService } from "@/services/authService";
 import { AlertCircle } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useTranslations } from "next-intl";
+import { useScopedI18n } from "@/locales/client";
 
 export default function LoginPage() {
-  const t = useTranslations("Auth.Login");
+  const t = useScopedI18n("Auth.Login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -35,17 +35,19 @@ export default function LoginPage() {
       login(data.token, data.user);
 
       // Redirect based on role
-      let targetPath = `/${locale}`;
-      if (data.user.role === "client") {
-        targetPath = `/${locale}/client`;
-      } else if (data.user.role === "agent") {
-        targetPath = `/${locale}/agent`; // To be implemented
-      } else if (data.user.role === "admin") {
-        targetPath = `/${locale}/admin`; // To be implemented
-      } else if (callbackUrl) {
+      const roleRedirects: Record<string, string> = {
+        buyer: "/buyer",
+        realtor: "/realtor",
+        seller: "/seller",
+        admin: "/admin",
+      };
+
+      let targetPath = `/${locale}${roleRedirects[data.user.role] || ""}`;
+
+      if (!roleRedirects[data.user.role] && callbackUrl) {
         targetPath = `/${locale}${callbackUrl.startsWith('/') ? callbackUrl : '/' + callbackUrl}`;
       }
-      
+
       router.push(targetPath);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
@@ -82,41 +84,30 @@ export default function LoginPage() {
               <span>{error}</span>
             </div>
           )}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-slate-300">
-              {t("email")}
-            </label>
-            <div className="mt-2">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6 text-slate-300">
-              {t("password")}
-            </label>
-            <div className="mt-2">
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
+          <FormInput
+            label={t("email")}
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <FormInput
+            label={t("password")}
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">

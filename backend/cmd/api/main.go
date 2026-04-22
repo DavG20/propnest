@@ -1,15 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/DavG20/propnest-backend/internal/config"
 	"github.com/DavG20/propnest-backend/internal/handlers"
+	"github.com/DavG20/propnest-backend/internal/middleware"
+	"github.com/DavG20/propnest-backend/internal/models"
 	"github.com/DavG20/propnest-backend/internal/repository"
 	"github.com/DavG20/propnest-backend/internal/service"
 	"github.com/DavG20/propnest-backend/pkg/database"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 	"strings"
 )
@@ -27,10 +31,16 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Run migrations for the new model
+	database.DB.AutoMigrate(&models.UserToken{})
+
 	// Initialize Repository, Service, and Handlers
 	userRepo := repository.NewUserRepository(database.DB)
-	authService := service.NewAuthService(userRepo, []byte(cfg.JWTSecret))
+	tokenRepo := repository.NewUserTokenRepository(database.DB)
+	authService := service.NewAuthService(userRepo, tokenRepo, []byte(cfg.JWTSecret))
 	authHandler := handlers.NewAuthHandler(authService)
+
+	authMiddleware := middleware.AuthMiddleware(tokenRepo, []byte(cfg.JWTSecret))
 
 	mux := http.NewServeMux()
 
@@ -43,6 +53,16 @@ func main() {
 	// Auth routes
 	mux.HandleFunc("/api/register", authHandler.Register)
 	mux.HandleFunc("/api/login", authHandler.Login)
+	mux.HandleFunc("/api/logout", authHandler.Logout)
+
+	// Protected routes
+	mux.Handle("/api/me", authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		claims := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"user": claims,
+		})
+	})))
 
 	// Simple CORS middleware
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

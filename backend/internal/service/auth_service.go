@@ -2,33 +2,37 @@ package service
 
 import (
 	"errors"
+	"time"
+
 	"github.com/DavG20/propnest-backend/internal/auth"
+	"github.com/DavG20/propnest-backend/internal/dto"
 	"github.com/DavG20/propnest-backend/internal/models"
 	"github.com/DavG20/propnest-backend/internal/repository"
 )
 
 type AuthService interface {
-	Register(name, email, password string, role models.Role) (int, error)
-	Login(email, password string) (string, *models.User, error)
+	Register(req *dto.RegisterRequest) (int, error)
+	Login(req *dto.LoginRequest) (string, *models.User, error)
+	Logout(req *dto.LogoutRequest) (bool, error)
 }
 
 type authService struct {
-	repo      repository.UserRepository
-	jwtSecret []byte
+	repo       repository.UserRepository
+	tokenRepo  repository.UserTokenRepository
+	jwtSecret  []byte
 }
 
-func NewAuthService(repo repository.UserRepository, secret []byte) AuthService {
-	return &authService{repo: repo, jwtSecret: secret}
-}
-
-func (s *authService) Register(name, email, password string, role models.Role) (int, error) {
-	// Validate role
-	if role != models.RoleAdmin && role != models.RoleAgent && role != models.RoleClient {
-		return 0, errors.New("invalid role provided")
+func NewAuthService(repo repository.UserRepository, tokenRepo repository.UserTokenRepository, secret []byte) AuthService {
+	return &authService{
+		repo:      repo,
+		tokenRepo: tokenRepo,
+		jwtSecret: secret,
 	}
+}
 
+func (s *authService) Register(req *dto.RegisterRequest) (int, error) {
 	// Check if user exists
-	existingUser, err := s.repo.GetUserByEmail(email)
+	existingUser, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil {
 		return 0, err
 	}
@@ -37,17 +41,17 @@ func (s *authService) Register(name, email, password string, role models.Role) (
 	}
 
 	// Hash password
-	hashedPassword, err := auth.HashPassword(password)
+	hashedPassword, err := auth.HashPassword(req.Password)
 	if err != nil {
 		return 0, err
 	}
 
 	// Save to DB
-	return s.repo.CreateUser(name, email, hashedPassword, role)
+	return s.repo.CreateUser(req.Name, req.Email, hashedPassword, req.Role)
 }
 
-func (s *authService) Login(email, password string) (string, *models.User, error) {
-	user, err := s.repo.GetUserByEmail(email)
+func (s *authService) Login(req *dto.LoginRequest) (string, *models.User, error) {
+	user, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil {
 		return "", nil, err
 	}
@@ -56,7 +60,7 @@ func (s *authService) Login(email, password string) (string, *models.User, error
 	}
 
 	// Check password
-	if !auth.CheckPasswordHash(password, user.PasswordHash) {
+	if !auth.CheckPasswordHash(req.Password, user.PasswordHash) {
 		return "", nil, errors.New("invalid email or password")
 	}
 
@@ -66,5 +70,20 @@ func (s *authService) Login(email, password string) (string, *models.User, error
 		return "", nil, err
 	}
 
+	// Save token to whitelist (active by default)
+	expiresAt := time.Now().Add(time.Hour * 24)
+	err = s.tokenRepo.CreateToken(user.ID, token, expiresAt)
+	if err != nil {
+		return "", nil, err
+	}
+
 	return token, user, nil
+}
+
+func (s *authService) Logout(req *dto.LogoutRequest) (bool, error) {
+	err := s.tokenRepo.InvalidateToken(req.Token)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }

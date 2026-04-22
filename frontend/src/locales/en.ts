@@ -1,0 +1,100 @@
+export default {
+  Nav: {
+    listings: 'Listings',
+    agents: 'Realtors',
+    about: 'About',
+    signIn: 'Sign In',
+    getStarted: 'Get Started',
+  },
+  Auth: {
+    Login: {
+      title: 'Sign in to your account',
+      subtitle: 'Or',
+      noAccount: 'start your 14-day free trial',
+      email: 'Email address',
+      password: 'Password',
+      remember: 'Remember me',
+      forgot: 'Forgot password?',
+      submit: 'Sign in',
+      continueWith: 'Or continue with',
+      registeredSuccess: 'Registration successful! Please sign in with your new account.',
+    },
+    Register: {
+      title: 'Create an account',
+      subtitle: 'Already have an account?',
+      hasAccount: 'Sign in',
+      name: 'Full Name',
+      email: 'Email address',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      submit: 'Create Account',
+      roles: {
+        buyer: 'I want to Buy',
+        seller: 'I want to Sell',
+        realtor: 'I am a Realtor',
+      },
+    },
+  },
+  Hero: {
+    badge: 'The Future of Real Estate',
+    headline1: "Find A Place You'll",
+    headline2: 'Truly Call Home',
+    description:
+      'Propnest uses smart matching and verified premium listings to help you discover the perfect property seamlessly and securely.',
+    searchPlaceholder: 'Search by city, neighborhood, or zip code',
+    searchButton: 'Search',
+  },
+  FeaturedListings: {
+    title: 'Featured Listings',
+    subtitle: 'Discover handpicked premium properties from around the world.',
+    viewAll: 'View all',
+  },
+  WhyUs: {
+    title: 'Why Choose Propnest?',
+    subtitle:
+      "We've redesigned the real estate journey to be totally frictionless, putting power and transparency back in your hands.",
+    verified: 'Verified Listings',
+    verifiedDesc: 'Every property undergoes strict vetting to ensure 100% accuracy and zero scams.',
+    smart: 'Smart Matching',
+    smartDesc: "Our AI analyzes your preferences to show you homes you'll actually love.",
+    insights: 'Market Insights',
+    insightsDesc: 'Make informed decisions with real-time data on neighborhood pricing trends.',
+  },
+  CTA: {
+    title: 'Ready to find your nest?',
+    subtitle: 'Join thousands of others who found their dream home on Propnest.',
+    button: 'Create Free Account',
+  },
+  PropertyCard: {
+    beds: 'Beds',
+    baths: 'Baths',
+    sqft: 'sqft',
+  },
+  Dashboard: {
+    Sidebar: {
+      overview: 'Overview',
+      search: 'Search Properties',
+      saved: 'My Saved',
+      messages: 'Messages',
+      settings: 'Settings',
+      signOut: 'Sign Out',
+    },
+    Buyer: {
+      welcome: 'Welcome back,',
+      subtitle: "Here's what's happening with your property search today.",
+      stats: {
+        viewed: 'Properties Viewed',
+        saved: 'Saved Listings',
+        inquiries: 'Active Inquiries',
+      },
+      recent: {
+        title: 'Recently Viewed',
+        subtitle: "Properties you've looked at lately",
+      },
+      ai: {
+        title: 'AI Recommendations',
+        subtitle: 'Based on your preferences and search history',
+      },
+    },
+  },
+} as const;

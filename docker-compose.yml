@@ -1,14 +1,14 @@
-services:
-  db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: propnest
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: propnest
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  services:
+    db:
+      image: postgres:15-alpine
+      environment:
+        POSTGRES_USER: propnest
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: propnest
+      ports:
+        - "5433:5432"
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+  volumes:
+    postgres_data:

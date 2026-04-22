@@ -19,27 +19,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for saved user in localStorage on mount
-    const savedUser = localStorage.getItem("propnest_user");
+    const savedUser = localStorage.getItem("user");
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (e) {
         console.error("Failed to parse saved user", e);
-        localStorage.removeItem("propnest_user");
+        localStorage.removeItem("user");
       }
     }
     setIsLoading(false);
   }, []);
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem("propnest_token", token);
-    localStorage.setItem("propnest_user", JSON.stringify(userData));
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("propnest_token");
-    localStorage.removeItem("propnest_user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
   };
 

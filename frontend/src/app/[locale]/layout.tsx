@@ -1,7 +1,5 @@
-import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { I18nProviderClient } from "@/locales/client";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import { AuthProvider } from "@/context/AuthContext";
@@ -17,22 +15,24 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
 
   // Validate that locale is supported
-  if (!hasLocale(routing.locales, locale)) {
+  const locales = ['en', 'am'];
+  if (!locales.includes(locale as any)) {
     notFound();
   }
 
-  // Load messages for the current locale
-  const messages = await getMessages();
-
   return (
     <html lang={locale}>
+      <head>
+        <link rel="icon" href="/images/logo.png" />
+      </head>
       <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
+        <I18nProviderClient locale={locale}>
           <AuthProvider>
             {children}
           </AuthProvider>
-        </NextIntlClientProvider>
+        </I18nProviderClient>
       </body>
     </html>
   );
 }
+
