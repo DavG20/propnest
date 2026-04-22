@@ -1,9 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Search, Home, Shield, TrendingUp, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import PropertyCard from "./properties/_components/PropertyCard";
 
 export default function LandingPage() {
+  const t = useTranslations();
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 relative selection:bg-emerald-500/30">
       
@@ -22,14 +24,14 @@ export default function LandingPage() {
           <span className="text-xl font-bold tracking-tight">Propnest</span>
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-          <Link href="#" className="hover:text-white transition-colors">Listings</Link>
-          <Link href="#" className="hover:text-white transition-colors">Agents</Link>
-          <Link href="#" className="hover:text-white transition-colors">About</Link>
+          <Link href="#" className="hover:text-white transition-colors">{t("Nav.listings")}</Link>
+          <Link href="#" className="hover:text-white transition-colors">{t("Nav.agents")}</Link>
+          <Link href="#" className="hover:text-white transition-colors">{t("Nav.about")}</Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium hover:text-white transition-colors hidden sm:block">Sign In</Link>
+          <Link href="/login" className="text-sm font-medium hover:text-white transition-colors hidden sm:block">{t("Nav.signIn")}</Link>
           <Link href="/register" className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-5 py-2 rounded-full transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]">
-            Get Started
+            {t("Nav.getStarted")}
           </Link>
         </div>
       </nav>
@@ -42,16 +44,16 @@ export default function LandingPage() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          The Future of Real Estate
+          {t("Hero.badge")}
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter max-w-4xl mb-6">
-          Find A Place You'll <br className="hidden md:block" />
-          <span className="text-gradient">Truly Call Home</span>
+          {t("Hero.headline1")} <br className="hidden md:block" />
+          <span className="text-gradient">{t("Hero.headline2")}</span>
         </h1>
         
         <p className="text-lg md:text-xl text-slate-400 max-w-2xl mb-12">
-          Propnest uses smart matching and verified premium listings to help you discover the perfect property seamlessly and securely.
+          {t("Hero.description")}
         </p>
 
         {/* Search Bar Widget */}
@@ -60,12 +62,12 @@ export default function LandingPage() {
             <Search className="w-5 h-5 text-slate-400 mr-3" />
             <input 
               type="text" 
-              placeholder="Search by city, neighborhood, or zip code" 
+              placeholder={t("Hero.searchPlaceholder")}
               className="bg-transparent border-none outline-none w-full text-white placeholder:text-slate-500"
             />
           </div>
           <button className="bg-white text-slate-950 px-8 py-3 rounded-lg font-medium hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
-            Search
+            {t("Hero.searchButton")}
           </button>
         </div>
       </main>
@@ -74,11 +76,11 @@ export default function LandingPage() {
       <section className="relative z-10 py-24 px-6 sm:px-12 max-w-7xl mx-auto">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight mb-2">Featured Listings</h2>
-            <p className="text-slate-400">Discover handpicked premium properties from around the world.</p>
+            <h2 className="text-3xl font-bold tracking-tight mb-2">{t("FeaturedListings.title")}</h2>
+            <p className="text-slate-400">{t("FeaturedListings.subtitle")}</p>
           </div>
           <Link href="#" className="hidden sm:flex text-emerald-400 hover:text-emerald-300 font-medium items-center gap-1 transition-colors">
-            View all <ChevronRight size={16} />
+            {t("FeaturedListings.viewAll")} <ChevronRight size={16} />
           </Link>
         </div>
 
@@ -126,8 +128,8 @@ export default function LandingPage() {
       <section className="relative z-10 py-24 bg-slate-900/30 border-y border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-12">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">Why Choose Propnest?</h2>
-            <p className="text-slate-400">We've redesigned the real estate journey to be totally frictionless, putting power and transparency back in your hands.</p>
+            <h2 className="text-3xl font-bold tracking-tight mb-4">{t("WhyUs.title")}</h2>
+            <p className="text-slate-400">{t("WhyUs.subtitle")}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -135,22 +137,22 @@ export default function LandingPage() {
               <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Shield className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Verified Listings</h3>
-              <p className="text-slate-400 text-sm">Every property undergoes strict vetting to ensure 100% accuracy and zero scams.</p>
+              <h3 className="text-xl font-semibold mb-3">{t("WhyUs.verified")}</h3>
+              <p className="text-slate-400 text-sm">{t("WhyUs.verifiedDesc")}</p>
             </div>
             <div className="glass-panel p-8 text-center bg-slate-900/50 transform md:-translate-y-4">
               <div className="w-14 h-14 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Search className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Smart Matching</h3>
-              <p className="text-slate-400 text-sm">Our AI analyzes your preferences to show you homes you'll actually love.</p>
+              <h3 className="text-xl font-semibold mb-3">{t("WhyUs.smart")}</h3>
+              <p className="text-slate-400 text-sm">{t("WhyUs.smartDesc")}</p>
             </div>
             <div className="glass-panel p-8 text-center bg-slate-900/50">
               <div className="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <TrendingUp className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Market Insights</h3>
-              <p className="text-slate-400 text-sm">Make informed decisions with real-time data on neighborhood pricing trends.</p>
+              <h3 className="text-xl font-semibold mb-3">{t("WhyUs.insights")}</h3>
+              <p className="text-slate-400 text-sm">{t("WhyUs.insightsDesc")}</p>
             </div>
           </div>
         </div>
@@ -158,10 +160,10 @@ export default function LandingPage() {
 
       {/* CTA Footer */}
       <footer className="relative z-10 py-24 px-6 sm:px-12 max-w-4xl mx-auto text-center">
-        <h2 className="text-4xl font-bold mb-6">Ready to find your nest?</h2>
-        <p className="text-lg text-slate-400 mb-10">Join thousands of others who found their dream home on Propnest.</p>
+        <h2 className="text-4xl font-bold mb-6">{t("CTA.title")}</h2>
+        <p className="text-lg text-slate-400 mb-10">{t("CTA.subtitle")}</p>
         <Link href="/register" className="bg-white text-slate-950 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-200 transition-all hover:scale-105 inline-flex items-center gap-2">
-          Create Free Account <ChevronRight size={20} />
+          {t("CTA.button")} <ChevronRight size={20} />
         </Link>
       </footer>
 

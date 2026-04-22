@@ -11,6 +11,7 @@ import (
 	"github.com/DavG20/propnest-backend/internal/service"
 	"github.com/DavG20/propnest-backend/pkg/database"
 	"github.com/joho/godotenv"
+	"strings"
 )
 
 func main() {
@@ -43,9 +44,43 @@ func main() {
 	mux.HandleFunc("/api/register", authHandler.Register)
 	mux.HandleFunc("/api/login", authHandler.Login)
 
+	// Simple CORS middleware
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		allowedOrigins := strings.Split(cfg.AllowedOrigins, ",")
+		
+		isAllowed := false
+		for _, o := range allowedOrigins {
+			if o == origin {
+				isAllowed = true
+				break
+			}
+		}
+
+		if isAllowed {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		} else {
+			// Fallback to first allowed if not matched
+			if len(allowedOrigins) > 0 {
+				w.Header().Set("Access-Control-Allow-Origin", allowedOrigins[0])
+			}
+		}
+		
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		mux.ServeHTTP(w, r)
+	})
+
 	port := ":8080"
 	fmt.Printf("Starting Propnest backend server on %s\n", port)
-	if err := http.ListenAndServe(port, mux); err != nil {
+	if err := http.ListenAndServe(port, handler); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }

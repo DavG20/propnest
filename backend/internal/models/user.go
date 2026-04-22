@@ -9,7 +9,8 @@ type Role string
 const (
 	RoleAdmin  Role = "admin"
 	RoleAgent  Role = "agent"
-	RoleClient Role = "client"
+	RoleClient Role = "buyer"
+	RoleSeller Role = "seller"
 )
 
 type User struct {

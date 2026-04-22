@@ -9,7 +9,7 @@ import (
 
 type AuthService interface {
 	Register(name, email, password string, role models.Role) (int, error)
-	Login(email, password string) (string, error)
+	Login(email, password string) (string, *models.User, error)
 }
 
 type authService struct {
@@ -46,25 +46,25 @@ func (s *authService) Register(name, email, password string, role models.Role) (
 	return s.repo.CreateUser(name, email, hashedPassword, role)
 }
 
-func (s *authService) Login(email, password string) (string, error) {
+func (s *authService) Login(email, password string) (string, *models.User, error) {
 	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	if user == nil {
-		return "", errors.New("invalid email or password")
+		return "", nil, errors.New("invalid email or password")
 	}
 
 	// Check password
 	if !auth.CheckPasswordHash(password, user.PasswordHash) {
-		return "", errors.New("invalid email or password")
+		return "", nil, errors.New("invalid email or password")
 	}
 
 	// Generate JWT
 	token, err := auth.GenerateJWT(user.ID, user.Email, s.jwtSecret)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	return token, nil
+	return token, user, nil
 }
