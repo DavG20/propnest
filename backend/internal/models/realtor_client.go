@@ -2,7 +2,6 @@ package models
 
 import "time"
 
-// RealtorClient represents the relationship between a Realtor and their Client (Buyer or Seller)
 type RealtorClient struct {
 	ID        int       `json:"id" gorm:"primaryKey"`
 	RealtorID int       `json:"realtor_id" gorm:"not null;index"`

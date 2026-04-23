@@ -5,7 +5,11 @@ import {
   RegisterRequest,
   RegisterResponse,
   LogoutRequest,
-  LogoutResponse
+  LogoutResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
 } from "@/types/auth";
 
 export const authService = {
@@ -31,6 +35,20 @@ export const authService = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+    });
+  },
+
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> => {
+    return apiRequest<ForgotPasswordResponse>("/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  resetPassword: async (data: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
+    return apiRequest<ResetPasswordResponse>("/reset-password", {
+      method: "POST",
+      body: JSON.stringify(data),
     });
   },
 };

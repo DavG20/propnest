@@ -11,6 +11,7 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+  confirm_password: string;
   role: Role;
 }
 
@@ -35,4 +36,22 @@ export interface RegisterResponse {
 
 export interface LogoutResponse {
   status: boolean;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+  confirm_password: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
 }

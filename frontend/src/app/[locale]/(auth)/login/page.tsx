@@ -4,11 +4,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { FormInput } from "@/components/ui/FormInput";
 import { authService } from "@/services/authService";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useScopedI18n } from "@/locales/client";
+import PasswordInput from "@/components/ui/password";
 
 export default function LoginPage() {
   const t = useScopedI18n("Auth.Login");
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
   const router = useRouter();
@@ -96,18 +98,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-
-          <FormInput
-            label={t("password")}
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <PasswordInput showPassword={showPassword} setShowPassword={setShowPassword} password={password} setPassword={setPassword} />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -123,9 +114,9 @@ export default function LoginPage() {
             </div>
 
             <div className="text-sm leading-6">
-              <a href="#" className="font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+              <Link href={`/${locale}/forgot-password`} className="font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
                 {t("forgot")}
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/DavG20/propnest-backend/internal/config"
 	"github.com/DavG20/propnest-backend/internal/handlers"
+	"github.com/DavG20/propnest-backend/internal/mailer"
 	"github.com/DavG20/propnest-backend/internal/middleware"
 	"github.com/DavG20/propnest-backend/internal/models"
 	"github.com/DavG20/propnest-backend/internal/repository"
@@ -15,7 +17,6 @@ import (
 	"github.com/DavG20/propnest-backend/pkg/database"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
-	"strings"
 )
 
 func main() {
@@ -31,13 +32,25 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Run migrations for the new model
+	// Run migrations
+	database.DB.AutoMigrate(&models.User{})
 	database.DB.AutoMigrate(&models.UserToken{})
+	database.DB.AutoMigrate(&models.PasswordResetToken{})
 
 	// Initialize Repository, Service, and Handlers
 	userRepo := repository.NewUserRepository(database.DB)
 	tokenRepo := repository.NewUserTokenRepository(database.DB)
-	authService := service.NewAuthService(userRepo, tokenRepo, []byte(cfg.JWTSecret))
+	resetRepo := repository.NewPasswordResetRepository(database.DB)
+
+	m := mailer.New(mailer.Config{
+		Host:     cfg.SMTPHost,
+		Port:     cfg.SMTPPort,
+		Username: cfg.SMTPUsername,
+		Password: cfg.SMTPPassword,
+		From:     cfg.SMTPFrom,
+	})
+
+	authService := service.NewAuthService(userRepo, tokenRepo, resetRepo, m, []byte(cfg.JWTSecret), cfg.AppURL)
 	authHandler := handlers.NewAuthHandler(authService)
 
 	authMiddleware := middleware.AuthMiddleware(tokenRepo, []byte(cfg.JWTSecret))
@@ -54,6 +67,8 @@ func main() {
 	mux.HandleFunc("/api/register", authHandler.Register)
 	mux.HandleFunc("/api/login", authHandler.Login)
 	mux.HandleFunc("/api/logout", authHandler.Logout)
+	mux.HandleFunc("/api/forgot-password", authHandler.ForgotPassword)
+	mux.HandleFunc("/api/reset-password", authHandler.ResetPassword)
 
 	// Protected routes
 	mux.Handle("/api/me", authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

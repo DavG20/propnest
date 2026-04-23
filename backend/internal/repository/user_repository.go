@@ -10,6 +10,8 @@ import (
 type UserRepository interface {
 	CreateUser(name, email, passwordHash string, role models.Role) (int, error)
 	GetUserByEmail(email string) (*models.User, error)
+	GetUserByID(id int) (*models.User, error)
+	UpdatePasswordHash(userID int, newHash string) error
 }
 
 type userRepository struct {
@@ -47,4 +49,21 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (r *userRepository) GetUserByID(id int) (*models.User, error) {
+	var user models.User
+	err := r.db.First(&user, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *userRepository) UpdatePasswordHash(userID int, newHash string) error {
+	return r.db.Model(&models.User{}).Where("id = ?", userID).
+		Update("password_hash", newHash).Error
 }

@@ -10,6 +10,7 @@ import { authService } from "@/services/authService";
 import { useAuth } from "@/context/AuthContext";
 import { AlertCircle, User, Layout, Briefcase } from "lucide-react";
 import { Role } from "@/types/auth";
+import PasswordInput from "@/components/ui/password";
 
 export default function RegisterPage() {
   const t = useScopedI18n("Auth.Register");
@@ -24,7 +25,8 @@ export default function RegisterPage() {
   const [role, setRole] = useState<Role>("buyer");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -36,7 +38,7 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      await authService.register({ name, email, password, role });
+      await authService.register({ name, email, password, confirm_password: confirmPassword, role });
       router.push(`/${locale}/login?registered=true`);
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -92,7 +94,6 @@ export default function RegisterPage() {
               <span>{error}</span>
             </div>
           )}
-          
           <FormInput
             label={t("name")}
             id="name"
@@ -117,29 +118,9 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <FormInput
-            label={t("password")}
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <PasswordInput showPassword={showPassword} setShowPassword={setShowPassword} password={password} setPassword={setPassword} />
 
-          <FormInput
-            label={t("confirmPassword")}
-            id="confirm-password"
-            name="confirm-password"
-            type="password"
-            autoComplete="new-password"
-            required
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+          <PasswordInput showPassword={showConfirmPassword} setShowPassword={setShowConfirmPassword} password={confirmPassword} setPassword={setConfirmPassword} />
 
           <div>
             <Button type="submit" className="w-full" isLoading={isLoading}>
