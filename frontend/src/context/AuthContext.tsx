@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string, userData: User) => void;
+  login: (token: string, userData: User, rememberMe?: boolean) => void;
   logout: () => void;
 }
 
@@ -18,28 +18,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved user in localStorage on mount
-    const savedUser = localStorage.getItem("user");
+    const savedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (e) {
         console.error("Failed to parse saved user", e);
         localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
       }
     }
     setIsLoading(false);
   }, []);
 
-  const login = (token: string, userData: User) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = (token: string, userData: User, rememberMe: boolean = false) => {
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem("token", token);
+    storage.setItem("user", JSON.stringify(userData));
     setUser(userData);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     setUser(null);
   };
 

@@ -9,7 +9,7 @@ db:
 	docker-compose up -d db
 
 backend:
-	cd backend && go run cmd/api/main.go & echo $$! > .backend.pid
+	cd backend && go run ./cmd/api & echo $$! > .backend.pid
 
 frontend:
 	cd frontend && npm run dev & echo $$! > .frontend.pid

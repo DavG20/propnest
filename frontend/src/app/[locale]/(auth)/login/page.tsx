@@ -6,7 +6,7 @@ import { FormInput } from "@/components/ui/FormInput";
 import { authService } from "@/services/authService";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useScopedI18n } from "@/locales/client";
 import PasswordInput from "@/components/ui/password";
@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
@@ -27,14 +28,30 @@ export default function LoginPage() {
 
   const callbackUrl = searchParams.get("callbackUrl") || "";
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedEmail = localStorage.getItem("rememberedEmail");
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+
     try {
-      const data = await authService.login({ email, password });
-      login(data.token, data.user);
+      const data = await authService.login({ email, password, rememberMe });
+      login(data.token, data.user, rememberMe);
 
       // Redirect based on role
       const roleRedirects: Record<string, string> = {
@@ -106,6 +123,8 @@ export default function LoginPage() {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-700 bg-slate-900/50 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-950"
               />
               <label htmlFor="remember-me" className="ml-3 block text-sm leading-6 text-slate-400">

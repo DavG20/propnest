@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,11 +10,9 @@ import (
 	"github.com/DavG20/propnest-backend/internal/handlers"
 	"github.com/DavG20/propnest-backend/internal/mailer"
 	"github.com/DavG20/propnest-backend/internal/middleware"
-	"github.com/DavG20/propnest-backend/internal/models"
 	"github.com/DavG20/propnest-backend/internal/repository"
 	"github.com/DavG20/propnest-backend/internal/service"
 	"github.com/DavG20/propnest-backend/pkg/database"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 )
 
@@ -31,11 +28,6 @@ func main() {
 	if err := database.InitDB(cfg); err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-
-	// Run migrations
-	database.DB.AutoMigrate(&models.User{})
-	database.DB.AutoMigrate(&models.UserToken{})
-	database.DB.AutoMigrate(&models.PasswordResetToken{})
 
 	// Initialize Repository, Service, and Handlers
 	userRepo := repository.NewUserRepository(database.DB)
@@ -53,31 +45,14 @@ func main() {
 	authService := service.NewAuthService(userRepo, tokenRepo, resetRepo, m, []byte(cfg.JWTSecret), cfg.AppURL)
 	authHandler := handlers.NewAuthHandler(authService)
 
+	propertyRepo := repository.NewPropertyRepository(database.DB)
+	propertyService := service.NewPropertyService(propertyRepo)
+	propertyHandler := handlers.NewPropertyHandler(propertyService)
+
 	authMiddleware := middleware.AuthMiddleware(tokenRepo, []byte(cfg.JWTSecret))
 
 	mux := http.NewServeMux()
-
-	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
-	})
-
-	// Auth routes
-	mux.HandleFunc("/api/register", authHandler.Register)
-	mux.HandleFunc("/api/login", authHandler.Login)
-	mux.HandleFunc("/api/logout", authHandler.Logout)
-	mux.HandleFunc("/api/forgot-password", authHandler.ForgotPassword)
-	mux.HandleFunc("/api/reset-password", authHandler.ResetPassword)
-
-	// Protected routes
-	mux.Handle("/api/me", authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		claims := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"user": claims,
-		})
-	})))
+	setupRoutes(mux, authHandler, propertyHandler, authMiddleware)
 
 	// Simple CORS middleware
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

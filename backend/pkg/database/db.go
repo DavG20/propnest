@@ -24,7 +24,14 @@ func InitDB(cfg *config.Config) error {
 	log.Println("Successfully connected to the database via GORM")
 
 	// Run migrations
-	if err := DB.AutoMigrate(&models.User{}); err != nil {
+	err = DB.AutoMigrate(
+		&models.User{},
+		&models.UserToken{},
+		&models.PasswordResetToken{},
+		&models.Property{},
+		&models.PropertyUser{},
+	)
+	if err != nil {
 		return fmt.Errorf("error migrating database: %w", err)
 	}
 	

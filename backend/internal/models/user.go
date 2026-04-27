@@ -19,6 +19,7 @@ type User struct {
 	Email        string    `json:"email" gorm:"uniqueIndex;not null"`
 	PasswordHash string    `json:"-" gorm:"not null"`
 	Role         Role      `json:"role" gorm:"type:varchar(20);not null;default:'client'"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	CreatedAt            time.Time      `json:"created_at"`
+	UpdatedAt            time.Time      `json:"updated_at"`
+	PropertyAssociations []PropertyUser `json:"property_associations" gorm:"foreignKey:UserID"`
 }
